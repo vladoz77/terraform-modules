@@ -1,0 +1,7 @@
+%{ for group, hosts in groups ~}
+[${group}]
+%{ for host in hosts ~}
+${host}
+%{ endfor ~}
+
+%{ endfor ~}
