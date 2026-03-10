@@ -66,7 +66,6 @@ variable "network_interfaces" {
     nat       = bool
     ip_address = optional(string)
     security_group = optional(set(string))
-    static_nat_ip_address = optional(string)
   }))
   description = "List of network interfaces for the VM."
   default = [{
@@ -74,7 +73,6 @@ variable "network_interfaces" {
     nat       = true
     ip_address = null
     security_group = null
-    static_nat_ip_address = null
   }]
 }
 
@@ -99,19 +97,6 @@ variable "labels" {
   type = map(string)
   nullable = true
   default = {}
-}
-
-variable "env_vars" {
-  type = map(string)
-  default = {}
-  description = "Env vars to inject to instance"
-  nullable = true
-}
-
-variable "username" {
-  type = string
-  default = "ubuntu"
-  description = "default user for vm"
 }
 
 variable "cloud_init" {
