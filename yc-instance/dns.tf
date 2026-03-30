@@ -5,7 +5,7 @@ resource "yandex_dns_recordset" "instance_dns" {
   zone_id = data.yandex_dns_zone.zone.id
   name    = each.value.name
   type    = each.value.type
-  ttl     =each.value.ttl
+  ttl     = each.value.ttl
   data    = [yandex_compute_instance.instance.network_interface[0].nat_ip_address]
 
   depends_on = [yandex_compute_instance.instance]

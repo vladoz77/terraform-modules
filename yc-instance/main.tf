@@ -18,9 +18,9 @@ resource "yandex_compute_instance" "instance" {
   zone                      = var.zone
 
   resources {
-    core_fraction       = var.core_fraction
-    cores               = var.cores
-    memory              = var.memory
+    core_fraction = var.core_fraction
+    cores         = var.cores
+    memory        = var.memory
   }
 
   boot_disk {
@@ -34,7 +34,7 @@ resource "yandex_compute_instance" "instance" {
   dynamic "secondary_disk" {
     for_each = yandex_compute_disk.additional_disks[*].id
 
-    content{
+    content {
       disk_id = secondary_disk.value
     }
   }
@@ -42,16 +42,17 @@ resource "yandex_compute_instance" "instance" {
   dynamic "network_interface" {
     for_each = var.network_interfaces
     content {
-      subnet_id           = network_interface.value.subnet_id
-      nat                 = network_interface.value.nat
-      ip_address          = network_interface.value.ip_address
-      security_group_ids  = network_interface.value.security_group
+      subnet_id          = network_interface.value.subnet_id
+      nat                = network_interface.value.nat
+      ip_address         = network_interface.value.ip_address
+      security_group_ids = network_interface.value.security_group
+      nat_ip_address     = network_interface.value.nat_ip_address
     }
   }
 
   metadata = {
-    ssh-keys = var.ssh
-    tags     = join(",", var.tags)
+    ssh-keys  = var.ssh
+    tags      = join(",", var.tags)
     user-data = var.cloud_init
   }
 
@@ -73,7 +74,7 @@ resource "null_resource" "wait_for_ssh" {
 
   provisioner "local-exec" {
     interpreter = ["/bin/bash", "-c"]
-    command = <<-EOT
+    command     = <<-EOT
       echo "Waiting for SSH on ${yandex_compute_instance.instance.name} (${yandex_compute_instance.instance.network_interface[0].nat_ip_address})..."
       timeout=${var.wait_timeout}
       while [ $timeout -gt 0 ]; do
