@@ -1,3 +1,4 @@
+# yc-network/variables.tf
 variable "zone" {
   type        = string
   description = "yandex zone"

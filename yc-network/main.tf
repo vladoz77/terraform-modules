@@ -1,3 +1,4 @@
+# yc-network/main.tf
 terraform {
   required_providers {
     yandex = {
