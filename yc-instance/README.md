@@ -30,9 +30,10 @@ Terraform-модуль для создания виртуальной машин
 - **`network_interfaces`** (`list(object)`, optional): список NIC:
   - `subnet_id` (`string`, required)
   - `nat` (`bool`, required)
+  - `nat_ip_address` (`string`, optional): внешний статический IP для NAT
   - `ip_address` (`string`, optional)
   - `security_group` (`set(string)`, optional)
-  По умолчанию создаётся один интерфейс `{ subnet_id = "", nat = true }` (обычно нужно переопределить `subnet_id`).
+  По умолчанию создаётся один интерфейс `{ subnet_id = null, nat = true, nat_ip_address = null }` (обычно нужно переопределить `subnet_id`).
 
 - **`boot_disk`** (`object({ type = string, size = number })`, required): параметры загрузочного диска. Образ выбирается по `os_name`.
 - **`additional_disks`** (`list(object({ size = number, type = string }))`, optional, default `[]`): дополнительные диски.
@@ -79,8 +80,9 @@ module "vm" {
 
   network_interfaces = [
     {
-      subnet_id = "your-subnet-id"
-      nat       = true
+      subnet_id      = "your-subnet-id"
+      nat            = true
+      nat_ip_address = "203.0.113.10"
     }
   ]
 
@@ -102,4 +104,46 @@ module "vm" {
 
 - Обязательные поля: `platform_id`, `folder_id`, `zone`, `boot_disk`.
 - Образ выбирается по `os_name` (image family), а не по `image_id`.
+- Для внешнего статического IP используй `network_interfaces[*].nat_ip_address`.
 - DNS сейчас создаёт A-запись на NAT IP **первого** сетевого интерфейса (`network_interface[0].nat_ip_address`).
+
+## Example with yc-network
+
+```hcl
+module "yc-network" {
+  source = "../yc-network"
+
+  zone         = "ru-central1-a"
+  network_name = "app-network"
+  subnet_name  = "app-subnet"
+  ipv4_cidr    = ["10.10.0.0/24"]
+
+  static_address = {
+    name                = "app-public-ip"
+    deletion_protection = true
+  }
+}
+
+module "vm" {
+  source = "../yc-instance"
+
+  folder_id   = "your-folder-id"
+  zone        = "ru-central1-a"
+  name        = "app-server-01"
+  platform_id = "standard-v1"
+  os_name     = "ubuntu-2404-lts"
+
+  boot_disk = {
+    type = "network-ssd"
+    size = 50
+  }
+
+  network_interfaces = [
+    {
+      subnet_id      = module.yc-network.subnet_id
+      nat            = true
+      nat_ip_address = module.yc-network.static_external_ipv4_address
+    }
+  ]
+}
+```

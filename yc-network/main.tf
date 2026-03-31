@@ -1,3 +1,4 @@
+# yc-network/main.tf
 terraform {
   required_providers {
     yandex = {
@@ -19,3 +20,13 @@ resource "yandex_vpc_subnet" "subnet" {
   network_id     = yandex_vpc_network.network.id  
 }
 
+resource "yandex_vpc_address" "addr" {
+  count = var.static_address == null ? 0 : 1
+
+  name                = try(var.static_address.name, null)
+  deletion_protection = try(var.static_address.deletion_protection, null)
+
+  external_ipv4_address {
+    zone_id = var.zone
+  }
+}
