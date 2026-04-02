@@ -18,7 +18,7 @@ variable "ingress_rules" {
   description = "Ingress rules for security group"
   default     = {}
   type = map(object({
-    protocol          = string
+    protocol          = optional(string)
     port              = optional(number)
     v4_cidr_blocks    = optional(list(string))
     description       = string
@@ -32,7 +32,7 @@ variable "egress_rules" {
   description = "Egress rules for security group"
   default     = {}
   type = map(object({
-    protocol          = string
+    protocol          = optional(string)
     port              = optional(number)
     v4_cidr_blocks    = optional(list(string))
     description       = string

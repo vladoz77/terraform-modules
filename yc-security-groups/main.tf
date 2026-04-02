@@ -18,7 +18,7 @@ resource "yandex_vpc_security_group" "sg" {
     for_each = var.ingress_rules
     iterator = item
     content {
-      protocol          = item.value.protocol
+      protocol          = try(item.value.protocol, null)
       port              = try(item.value.port, null)
       v4_cidr_blocks    = try(item.value.v4_cidr_blocks, null)
       description       = item.value.description
@@ -32,7 +32,7 @@ resource "yandex_vpc_security_group" "sg" {
     for_each = var.egress_rules
     iterator = item
     content {
-      protocol          = item.value.protocol
+      protocol          = try(item.value.protocol, null)
       port              = try(item.value.port, null)
       v4_cidr_blocks    = try(item.value.v4_cidr_blocks, null)
       description       = item.value.description
