@@ -19,6 +19,7 @@ Terraform-модуль для создания одной security group в Yand
 - **`ingress_rules`** (`map(object)`, optional, default `{}`): набор входящих правил. Ключ map используется только как удобный идентификатор правила.
   Поддерживаемые поля объекта:
   - `protocol` (`string`, required)
+    Допустимые значения: `ANY`, `TCP`, `UDP`, `ICMP`, `AH`, `ESP`, `GRE`.
   - `description` (`string`, required)
   - `port` (`number`, optional)
   - `from_port` (`number`, optional)
@@ -104,5 +105,7 @@ module "security_group" {
 
 - Модуль создаёт только одну security group.
 - Если `ingress_rules` или `egress_rules` пустые, соответствующие правила не будут созданы.
+- Значение `protocol` проверяется модулем и должно быть одним из: `ANY`, `TCP`, `UDP`, `ICMP`, `AH`, `ESP`, `GRE`.
+- Регистр не важен: модуль сам приводит протокол к верхнему регистру.
 - Для правил можно использовать либо `port`, либо диапазон `from_port` / `to_port`, в зависимости от сценария.
 - Сейчас модуль прокидывает только те поля правил, которые описаны во входных переменных: `protocol`, `port`, `from_port`, `to_port`, `v4_cidr_blocks`, `description`, `predefined_target`.
