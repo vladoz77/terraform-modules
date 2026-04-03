@@ -29,8 +29,8 @@ variable "ingress_rules" {
 
   validation {
     condition = alltrue([
-      for rule in values(var.ingress_rules) :
-      can(regex("^(ANY|TCP|UDP|ICMP|AH|ESP|GRE)$", upper(rule.protocol)))
+      for rule in values(var.egress_rules) :
+      contains(["ANY","TCP","UDP","ICMP","AH","ESP","GRE"], upper(rule.protocol))
     ])
     error_message = "Protocol must be one of: ANY, TCP, UDP, ICMP, AH, ESP, GRE."
   }
@@ -38,8 +38,8 @@ variable "ingress_rules" {
   validation {
     condition = alltrue(flatten([
       for rule in values(var.ingress_rules) : [
-        for cidr in(rule.v4_cidr_blocks != null ? rule.v4_cidr_blocks : []) :
-        can(cidrnetmask(cidr))
+        for cidr in try(rule.v4_cidr_blocks, []) :
+        can(cidrhost(cidr, 0))
       ]
     ]))
     error_message = "Each ingress_rules[*].v4_cidr_blocks value must be a valid IPv4 CIDR."
@@ -62,7 +62,7 @@ variable "egress_rules" {
   validation {
     condition = alltrue([
       for rule in values(var.egress_rules) :
-      can(regex("^(ANY|TCP|UDP|ICMP|AH|ESP|GRE)$", upper(rule.protocol)))
+      contains(["ANY","TCP","UDP","ICMP","AH","ESP","GRE"], upper(rule.protocol))
     ])
     error_message = "Protocol must be one of: ANY, TCP, UDP, ICMP, AH, ESP, GRE."
   }
@@ -70,8 +70,8 @@ variable "egress_rules" {
   validation {
     condition = alltrue(flatten([
       for rule in values(var.egress_rules) : [
-        for cidr in(rule.v4_cidr_blocks != null ? rule.v4_cidr_blocks : []) :
-        can(cidrnetmask(cidr))
+        for cidr in try(rule.v4_cidr_blocks, []) :
+        can(cidrhost(cidr, 0))
       ]
     ]))
     error_message = "Each egress_rules[*].v4_cidr_blocks value must be a valid IPv4 CIDR."
