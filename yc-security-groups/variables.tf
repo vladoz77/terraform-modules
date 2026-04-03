@@ -29,7 +29,7 @@ variable "ingress_rules" {
 
   validation {
     condition = alltrue([
-      for rule in values(var.egress_rules) :
+      for rule in values(var.ingress_rules) :
       contains(["ANY","TCP","UDP","ICMP","AH","ESP","GRE"], upper(rule.protocol))
     ])
     error_message = "Protocol must be one of: ANY, TCP, UDP, ICMP, AH, ESP, GRE."
